@@ -59,16 +59,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-6 py-12 text-zinc-900">
+    <div className="min-h-screen bg-zinc-50 px-6 py-12 text-zinc-900 flex items-center justify-center">
       <div className="mx-auto flex w-full max-w-md flex-col gap-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
         <header className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-600">
-            Woodmax Admin
+          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-600 flex items-center gap-1 justify-center">
+            Livingteak
           </p>
           <h1 className="text-2xl font-semibold">Login</h1>
-          <p className="text-sm text-zinc-500">
-            Use your admin account to access the dashboard.
-          </p>
+          
         </header>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -76,7 +74,7 @@ export default function LoginPage() {
             label="Email"
             name="email"
             type="email"
-            placeholder="admin@woodmax.com"
+            placeholder="enter your email"
             value={email}
             onChange={setEmail}
           />
