@@ -13,6 +13,15 @@ type LoginResponse = {
   };
 };
 
+function isLoginResponse(data: LoginResponse | { error?: string }): data is LoginResponse {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "token" in data &&
+    "user" in data
+  );
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -37,6 +46,10 @@ export default function LoginPage() {
 
       if (!response.ok || "error" in data) {
         throw new Error("error" in data ? data.error : "Login failed");
+      }
+
+      if (!isLoginResponse(data)) {
+        throw new Error("Login failed");
       }
 
       if (data.user.role !== "admin") {
