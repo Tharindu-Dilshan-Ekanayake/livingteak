@@ -13,14 +13,9 @@ type LoginResponse = {
   };
 };
 
-function isLoginResponse(data: LoginResponse | { error?: string }): data is LoginResponse {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    "token" in data &&
-    "user" in data
-  );
-}
+type LoginErrorResponse = {
+  error: string;
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,16 +35,14 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = (await response.json()) as
-        | LoginResponse
-        | { error?: string };
+      const data = (await response.json()) as LoginResponse | LoginErrorResponse;
 
-      if (!response.ok || "error" in data) {
-        throw new Error("error" in data ? data.error : "Login failed");
+      if (!response.ok) {
+        throw new Error("Login failed");
       }
 
-      if (!isLoginResponse(data)) {
-        throw new Error("Login failed");
+      if ("error" in data) {
+        throw new Error(data.error);
       }
 
       if (data.user.role !== "admin") {

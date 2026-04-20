@@ -11,6 +11,8 @@ if (!MONGODB_URI) {
   throw new Error('Missing MONGODB_URI in environment')
 }
 
+const MONGODB_URI_SAFE: string = MONGODB_URI
+
 const globalWithMongoose = globalThis as typeof globalThis & {
   mongoose?: MongooseCache
 }
@@ -25,7 +27,7 @@ export async function connectMongoose() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI)
+    cached.promise = mongoose.connect(MONGODB_URI_SAFE)
   }
 
   cached.conn = await cached.promise
