@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import InputField from "@/components/InputField";
+import toast from "react-hot-toast";
 
 type Product = {
   _id: string;
@@ -74,7 +75,6 @@ export default function AdminProductsPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -119,7 +119,6 @@ export default function AdminProductsPage() {
 
   const loadProducts = useCallback(async (nextPage: number, nextQuery: string) => {
     setLoading(true);
-    setStatus(null);
     try {
       const searchParams = new URLSearchParams();
       searchParams.set("page", String(nextPage));
@@ -140,9 +139,7 @@ export default function AdminProductsPage() {
       setProducts(Array.isArray(data?.items) ? data.items : []);
       setTotalPages(typeof data?.totalPages === "number" ? data.totalPages : 1);
     } catch (error) {
-      setStatus(
-        error instanceof Error ? error.message : "Failed to load products",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -166,7 +163,6 @@ export default function AdminProductsPage() {
   const openDeleteModal = (product: Product) => {
     setDeleteTarget(product);
     setIsDeleteModalOpen(true);
-    setStatus(null);
   };
 
   const closeDeleteModal = () => {
@@ -182,7 +178,6 @@ export default function AdminProductsPage() {
     setFiles([]);
     setExistingImages([]);
     setActive(true);
-    setStatus(null);
     setIsModalOpen(true);
   };
 
@@ -194,7 +189,6 @@ export default function AdminProductsPage() {
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
-    setStatus(null);
     setIsModalOpen(true);
   };
 
@@ -206,7 +200,6 @@ export default function AdminProductsPage() {
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
-    setStatus(null);
     setIsModalOpen(true);
   };
 
@@ -214,7 +207,7 @@ export default function AdminProductsPage() {
 
   const addOneImageFile = (file: File) => {
     if (totalSelectedImagesCount >= MAX_IMAGES) {
-      setStatus(`You can add up to ${MAX_IMAGES} images`);
+      toast.error(`You can add up to ${MAX_IMAGES} images`);
       return;
     }
     setFiles((prev) => [...prev, file].slice(0, Math.max(0, MAX_IMAGES - existingImages.length)));
@@ -253,35 +246,34 @@ export default function AdminProductsPage() {
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setStatus(null);
 
     const parsedName = name.trim();
     const parsedPrice = Number(price);
 
     if (!parsedName) {
-      setStatus("Product name is required");
+      toast.error("Product name is required");
       return;
     }
 
     if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
-      setStatus("Product price must be a number greater than or equal to 0");
+      toast.error("Product price must be a number greater than or equal to 0");
       return;
     }
 
     if (modalMode === "create") {
       if (totalSelectedImagesCount < 1 || totalSelectedImagesCount > MAX_IMAGES) {
-        setStatus(`Please select 1 to ${MAX_IMAGES} images`);
+        toast.error(`Please select 1 to ${MAX_IMAGES} images`);
         return;
       }
     }
 
     if (modalMode !== "create") {
       if (totalSelectedImagesCount < 1) {
-        setStatus("Please keep at least 1 image");
+        toast.error("Please keep at least 1 image");
         return;
       }
       if (totalSelectedImagesCount > MAX_IMAGES) {
-        setStatus(`You can upload up to ${MAX_IMAGES} images`);
+        toast.error(`You can upload up to ${MAX_IMAGES} images`);
         return;
       }
     }
@@ -312,13 +304,11 @@ export default function AdminProductsPage() {
       if (!response.ok)
         throw new Error(data?.error ?? "Failed to save product");
 
-      setStatus(modalMode === "edit" ? "Product updated" : "Product created");
+      toast.success(modalMode === "edit" ? "Product updated" : "Product created");
       closeModal();
       await loadProducts(page, query);
     } catch (error) {
-      setStatus(
-        error instanceof Error ? error.message : "Failed to save product",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to save product");
     } finally {
       setLoading(false);
     }
@@ -326,7 +316,6 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (product: Product) => {
     setLoading(true);
-    setStatus(null);
     try {
       const response = await fetch(`/api/products/${product._id}`, {
         method: "DELETE",
@@ -334,12 +323,10 @@ export default function AdminProductsPage() {
       const data = await response.json();
       if (!response.ok)
         throw new Error(data?.error ?? "Failed to delete product");
-      setStatus("Product deleted");
+      toast.success("Product deleted");
       await loadProducts(page, query);
     } catch (error) {
-      setStatus(
-        error instanceof Error ? error.message : "Failed to delete product",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to delete product");
     } finally {
       setLoading(false);
     }
@@ -393,8 +380,6 @@ export default function AdminProductsPage() {
             </button>
           </div>
         </div>
-
-        {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
 
         <div className="md:hidden">
           {loading ? (
@@ -531,7 +516,7 @@ export default function AdminProductsPage() {
                       {product.name}
                     </td>
                     <td className="px-4 py-3 text-zinc-700">
-                      ${product.price.toFixed(2)}
+                      <span className="text-xs font-semibold text-emerald-600">LKR </span>{product.price.toFixed(2)}
                     </td>
                     <td className="px-4 py-3">
                       {product.active === false ? (
@@ -648,7 +633,7 @@ export default function AdminProductsPage() {
                   onChange={isReadOnly ? undefined : setName}
                 />
                 <InputField
-                  label="Price"
+                  label="Price (LKR)"
                   name="modal_price"
                   type="number"
                   placeholder="1200"
@@ -790,10 +775,6 @@ export default function AdminProductsPage() {
                   Active
                 </span>
               </label>
-
-              {status ? (
-                <p className="text-sm text-zinc-600">{status}</p>
-              ) : null}
 
               {modalMode !== "view" ? (
                 <div className="flex flex-wrap gap-3">

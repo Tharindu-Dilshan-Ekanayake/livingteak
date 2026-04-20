@@ -27,7 +27,7 @@ export default function AdminNav({ onNavigate }: { onNavigate?: () => void } = {
   }
 
   return (
-    <nav className="flex h-full flex-col gap-4 text-zinc-100">
+    <nav className="flex h-full min-h-0 flex-col gap-4 text-zinc-100">
       <div className="px-2 pt-1">
         <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-400">
           Admin
@@ -56,11 +56,11 @@ export default function AdminNav({ onNavigate }: { onNavigate?: () => void } = {
         })}
       </ul>
 
-      <div className="mt-auto border-t border-zinc-800 pt-4 ">
+      <div className="mt-auto border-t border-zinc-800 pt-4">
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full rounded-xl border bg-red-500 border-zinc-800 px-4 py-2 text-left text-sm font-semibold text-zinc-200 transition hover:bg-red-600 hover:text-white text-center flex items-center justify-center"
+          className="flex w-full items-center justify-center rounded-xl border border-zinc-800 bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
         >
           Logout
         </button>

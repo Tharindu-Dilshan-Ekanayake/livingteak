@@ -39,16 +39,16 @@ export default function AdminShell({ children }: AdminShellProps) {
   if (token === null) return null
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-zinc-50 text-zinc-900">
-      <div className="flex min-h-screen w-full">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-zinc-900 text-zinc-100 md:block">
-          <div className="h-full border-r border-zinc-800 p-4">
+    <div className="h-screen w-full overflow-hidden bg-zinc-50 text-zinc-900">
+      <div className="flex h-screen w-full overflow-hidden">
+        <aside className="hidden h-full w-64 shrink-0 bg-zinc-900 text-zinc-100 md:block">
+          <div className="h-full border-r border-zinc-800 p-4 overflow-hidden">
             <AdminNav />
           </div>
         </aside>
 
-        <div className="flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3 md:hidden">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <header className="sticky top-0 z-30 flex w-full items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3 md:hidden">
             <button
               type="button"
               onClick={() => setIsSidebarOpen(true)}
@@ -65,7 +65,7 @@ export default function AdminShell({ children }: AdminShellProps) {
             <p className="text-sm font-semibold text-zinc-900">Admin</p>
           </header>
 
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="p-4 md:p-6">{children}</main>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export default function AdminShell({ children }: AdminShellProps) {
             (isSidebarOpen ? 'translate-x-0' : '-translate-x-full')
           }
         >
-          <div className="h-full border-r border-zinc-800 p-4">
+          <div className="h-full border-r border-zinc-800 p-4 overflow-hidden">
             <AdminNav onNavigate={() => setIsSidebarOpen(false)} />
           </div>
         </aside>
