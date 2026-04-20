@@ -46,54 +46,66 @@ function signToken(payload: LoginPayload & { id: string; role: string }) {
 }
 
 export async function POST(request: Request) {
-  let body: unknown
   try {
-    body = await request.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
-  }
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
 
-  const parsed = parseLoginBody(body)
-  if ('error' in parsed) {
-    return NextResponse.json({ error: parsed.error }, { status: 400 })
-  }
+    const parsed = parseLoginBody(body)
+    if ('error' in parsed) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 })
+    }
 
-  await connectMongoose()
+    await connectMongoose()
 
-  const user = await User.findOne({ email: parsed.value.email })
-  if (!user) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-  }
+    const user = await User.findOne({ email: parsed.value.email })
+    if (!user) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+    }
 
-  if (user.role !== 'admin') {
-    return NextResponse.json({ error: 'Access denied' }, { status: 403 })
-  }
+    if (user.role !== 'admin') {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+    }
 
-  const passwordOk = await bcrypt.compare(parsed.value.password, user.passwordHash)
-  if (!passwordOk) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-  }
+    if (!user.passwordHash || typeof user.passwordHash !== 'string') {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+    }
 
-  let token: string
-  try {
-    token = signToken({
-      id: String(user._id),
-      email: user.email,
-      role: user.role,
+    const passwordOk = await bcrypt.compare(parsed.value.password, user.passwordHash)
+    if (!passwordOk) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+    }
+
+    let token: string
+    try {
+      token = signToken({
+        id: String(user._id),
+        email: user.email,
+        role: user.role,
+      })
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Failed to sign token' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
     })
   } catch (error) {
+    console.error('Login error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to sign token' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     )
   }
-
-  return NextResponse.json({
-    token,
-    user: {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-    },
-  })
 }

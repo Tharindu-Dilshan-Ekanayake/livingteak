@@ -5,14 +5,6 @@ type MongooseCache = {
   promise: Promise<typeof mongoose> | null
 }
 
-const MONGODB_URI = process.env.MONGODB_URI
-
-if (!MONGODB_URI) {
-  throw new Error('Missing MONGODB_URI in environment')
-}
-
-const MONGODB_URI_SAFE: string = MONGODB_URI
-
 const globalWithMongoose = globalThis as typeof globalThis & {
   mongoose?: MongooseCache
 }
@@ -22,12 +14,17 @@ const cached = globalWithMongoose.mongoose ?? { conn: null, promise: null }
 globalWithMongoose.mongoose = cached
 
 export async function connectMongoose() {
+  const mongoUri = process.env.MONGODB_URI
+  if (!mongoUri) {
+    throw new Error('Missing MONGODB_URI in environment')
+  }
+
   if (cached.conn) {
     return cached.conn
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI_SAFE)
+    cached.promise = mongoose.connect(mongoUri)
   }
 
   cached.conn = await cached.promise
