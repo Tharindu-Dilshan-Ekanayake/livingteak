@@ -21,20 +21,34 @@ export default function AdminShell({ children }: AdminShellProps) {
     }
   }, [router, token])
 
+  useEffect(() => {
+    if (!isSidebarOpen) return
+
+    const previousBodyOverflow = document.body.style.overflow
+    const previousHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow
+      document.documentElement.style.overflow = previousHtmlOverflow
+    }
+  }, [isSidebarOpen])
+
   if (token === undefined) return null
   if (token === null) return null
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen w-full overflow-x-hidden bg-zinc-50 text-zinc-900">
       <div className="flex min-h-screen w-full">
         <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-zinc-900 text-zinc-100 md:block">
-          <div className="h-full overflow-y-auto border-r border-zinc-800 p-4">
+          <div className="h-full border-r border-zinc-800 p-4">
             <AdminNav />
           </div>
         </aside>
 
         <div className="flex min-h-screen flex-1 flex-col">
-          <header className="flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3 md:hidden">
+          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-zinc-200 bg-white px-4 py-3 md:hidden">
             <button
               type="button"
               onClick={() => setIsSidebarOpen(true)}
@@ -51,7 +65,7 @@ export default function AdminShell({ children }: AdminShellProps) {
             <p className="text-sm font-semibold text-zinc-900">Admin</p>
           </header>
 
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>
 

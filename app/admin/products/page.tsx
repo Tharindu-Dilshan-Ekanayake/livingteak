@@ -361,7 +361,7 @@ export default function AdminProductsPage() {
         <AdminHeader label="Products" />
       </header>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <section className="flex flex-col gap-4 rounded-none border-x-0 border-y border-zinc-200 bg-white p-4 shadow-none md:rounded-2xl md:border md:p-6 md:shadow-sm">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="w-full md:max-w-sm">
             <InputField
@@ -380,14 +380,14 @@ export default function AdminProductsPage() {
             <button
               type="button"
               onClick={openCreateModal}
-              className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
+              className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500 md:px-5 md:text-sm"
             >
               Add new product
             </button>
             <button
               type="button"
               onClick={() => loadProducts(page, query)}
-              className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300"
+              className="rounded-full border border-zinc-200 px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:border-zinc-300 md:px-5 md:text-sm"
             >
               Refresh
             </button>
@@ -396,11 +396,94 @@ export default function AdminProductsPage() {
 
         {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
 
-        <div className="overflow-x-auto rounded-2xl border border-zinc-200">
+        <div className="md:hidden">
+          {loading ? (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-500">
+              Loading...
+            </div>
+          ) : products.length === 0 ? (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-500">
+              No products found.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {products.map((product) => (
+                <div
+                  key={product._id}
+                  className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-none"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-zinc-900">
+                        {product.name}
+                      </p>
+                      <p className="mt-1 text-sm text-zinc-700">
+                        ${product.price.toFixed(2)}
+                      </p>
+                      <div className="mt-2">
+                        {product.active === false ? (
+                          <span className="text-xs font-semibold text-zinc-400">
+                            Inactive
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-emerald-600">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openViewModal(product)}
+                        aria-label="View"
+                        title="View"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white transition hover:bg-blue-500"
+                      >
+                        <IconEye className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(product)}
+                        aria-label="Edit"
+                        title="Edit"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white transition hover:bg-emerald-500"
+                      >
+                        <IconPencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openDeleteModal(product)}
+                        aria-label="Delete"
+                        title="Delete"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white transition hover:bg-red-500"
+                      >
+                        <IconTrash className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto rounded-2xl border border-zinc-200 md:block">
           <table className="min-w-full divide-y divide-zinc-200 text-sm">
             <thead className="bg-zinc-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                <th className="sticky left-0 z-10 border-r border-zinc-200 bg-zinc-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
                   Image
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
@@ -433,7 +516,7 @@ export default function AdminProductsPage() {
               ) : (
                 products.map((product) => (
                   <tr key={product._id} className="align-middle">
-                    <td className="px-4 py-3">
+                    <td className="sticky left-0 z-10 border-r border-zinc-200 bg-white px-4 py-3">
                       <div className="h-10 w-10 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50">
                         {product.images?.[0] ? (
                           <img
