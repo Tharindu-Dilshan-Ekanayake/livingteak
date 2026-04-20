@@ -10,10 +10,24 @@ function parseProduct(body: unknown) {
     return { error: 'Body must be a JSON object' }
   }
 
-  const { name, price } = body as { name?: unknown; price?: unknown }
+  const { name, price, images, active } = body as {
+    name?: unknown
+    price?: unknown
+    images?: unknown
+    active?: unknown
+  }
   const parsedName = typeof name === 'string' ? name.trim() : ''
   const parsedPrice =
     typeof price === 'number' ? price : typeof price === 'string' ? Number(price) : NaN
+
+  const parsedImages = Array.isArray(images)
+    ? images
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim())
+        .filter(Boolean)
+    : undefined
+
+  const parsedActive = typeof active === 'boolean' ? active : undefined
 
   if (!parsedName) {
     return { error: 'Product name is required' }
@@ -23,7 +37,10 @@ function parseProduct(body: unknown) {
     return { error: 'Product price must be a number greater than or equal to 0' }
   }
 
-  return { value: { name: parsedName, price: parsedPrice } }
+  const value: Record<string, unknown> = { name: parsedName, price: parsedPrice }
+  if (parsedImages) value.images = parsedImages
+  if (parsedActive !== undefined) value.active = parsedActive
+  return { value }
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {

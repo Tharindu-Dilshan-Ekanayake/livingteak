@@ -27,8 +27,8 @@ export default function AdminShell({ children }: AdminShellProps) {
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <div className="flex min-h-screen w-full">
-        <aside className="hidden w-64 shrink-0 bg-zinc-900 text-zinc-100 md:block">
-          <div className="h-full border-r border-zinc-800 p-4">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-zinc-900 text-zinc-100 md:block">
+          <div className="h-full overflow-y-auto border-r border-zinc-800 p-4">
             <AdminNav />
           </div>
         </aside>
