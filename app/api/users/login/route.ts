@@ -6,7 +6,6 @@ import User from '@/models/User'
 
 type LoginPayload = {
   email: string
-  password: string
 }
 
 function parseLoginBody(body: unknown) {
@@ -81,7 +80,6 @@ export async function POST(request: Request) {
       id: String(user._id),
       email: user.email,
       role: user.role,
-      ...parsed.value,
     })
   } catch (error) {
     return NextResponse.json(
