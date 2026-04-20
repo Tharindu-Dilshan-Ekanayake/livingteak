@@ -15,13 +15,14 @@ export default function AdminShell({ children }: AdminShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!token) {
+    if (token === null) {
       router.replace('/login')
       return
     }
   }, [router, token])
 
-  if (!token) return null
+  if (token === undefined) return null
+  if (token === null) return null
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
