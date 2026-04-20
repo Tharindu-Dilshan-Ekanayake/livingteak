@@ -15,6 +15,6 @@ export default function useLocalStorageValue(key: string) {
   return useSyncExternalStore(
     subscribe,
     () => localStorage.getItem(key),
-    () => null
+    () => undefined
   )
 }
