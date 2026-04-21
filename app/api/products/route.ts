@@ -11,13 +11,15 @@ function parseProduct(body: unknown) {
     return { error: 'Body must be a JSON object' }
   }
 
-  const { name, price, images, active } = body as {
+  const { name, description, price, images, active } = body as {
     name?: unknown
+    description?: unknown
     price?: unknown
     images?: unknown
     active?: unknown
   }
   const parsedName = typeof name === 'string' ? name.trim() : ''
+  const parsedDescription = typeof description === 'string' ? description.trim() : ''
   const parsedPrice =
     typeof price === 'number' ? price : typeof price === 'string' ? Number(price) : NaN
 
@@ -34,11 +36,19 @@ function parseProduct(body: unknown) {
     return { error: 'Product name is required' }
   }
 
+  if (!parsedDescription) {
+    return { error: 'Product description is required' }
+  }
+
   if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
     return { error: 'Product price must be a number greater than or equal to 0' }
   }
 
-  const value: Record<string, unknown> = { name: parsedName, price: parsedPrice }
+  const value: Record<string, unknown> = {
+    name: parsedName,
+    description: parsedDescription,
+    price: parsedPrice,
+  }
   if (parsedImages) value.images = parsedImages
   if (parsedActive !== undefined) value.active = parsedActive
   return { value }

@@ -9,6 +9,7 @@ type Product = {
   _id: string;
   name: string;
   price: number;
+  description: string;
   images?: string[];
   active?: boolean;
 };
@@ -90,6 +91,7 @@ export default function AdminProductsPage() {
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [active, setActive] = useState(true);
@@ -175,6 +177,7 @@ export default function AdminProductsPage() {
     setSelected(null);
     setName("");
     setPrice("");
+    setDescription("");
     setFiles([]);
     setExistingImages([]);
     setActive(true);
@@ -186,6 +189,7 @@ export default function AdminProductsPage() {
     setSelected(product);
     setName(product.name);
     setPrice(String(product.price));
+    setDescription(product.description ?? "");
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
@@ -197,6 +201,7 @@ export default function AdminProductsPage() {
     setSelected(product);
     setName(product.name);
     setPrice(String(product.price));
+    setDescription(product.description ?? "");
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
@@ -248,10 +253,16 @@ export default function AdminProductsPage() {
     event.preventDefault();
 
     const parsedName = name.trim();
+    const parsedDescription = description.trim();
     const parsedPrice = Number(price);
 
     if (!parsedName) {
       toast.error("Product name is required");
+      return;
+    }
+
+    if (!parsedDescription) {
+      toast.error("Product description is required");
       return;
     }
 
@@ -294,6 +305,7 @@ export default function AdminProductsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: parsedName,
+          description: parsedDescription,
           price: parsedPrice,
           images: imagesToSave,
           active,
@@ -642,6 +654,30 @@ export default function AdminProductsPage() {
                 />
               </div>
 
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="modal_description"
+                  className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="modal_description"
+                  name="modal_description"
+                  placeholder="Write a short description"
+                  value={description}
+                  readOnly={isReadOnly}
+                  onChange={
+                    isReadOnly
+                      ? undefined
+                      : (event) => {
+                          setDescription(event.target.value);
+                        }
+                  }
+                  className="min-h-28 resize-y rounded-xl border border-zinc-200 px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400"
+                />
+              </div>
+
               {modalMode !== "view" ? (
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
@@ -651,6 +687,7 @@ export default function AdminProductsPage() {
                     ref={imageInputRef}
                     type="file"
                     accept="image/*"
+                    aria-label="Upload product image"
                     className="hidden"
                     onChange={(event) => {
                       const file = event.currentTarget.files?.[0];
@@ -763,6 +800,17 @@ export default function AdminProductsPage() {
                 </div>
               ) : null}
 
+              {modalMode === "view" ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                    Description
+                  </p>
+                  <p className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700">
+                    {description || "-"}
+                  </p>
+                </div>
+              ) : null}
+
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -806,7 +854,7 @@ export default function AdminProductsPage() {
       ) : null}
 
       {fullScreenImageUrl ? (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <button
             type="button"
             aria-label="Close image"
@@ -833,7 +881,7 @@ export default function AdminProductsPage() {
       ) : null}
 
       {isDeleteModalOpen ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4">
           <button
             type="button"
             aria-label="Close delete confirmation"
