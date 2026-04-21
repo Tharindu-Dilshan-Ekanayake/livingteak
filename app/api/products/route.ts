@@ -61,9 +61,13 @@ export async function GET(request: Request) {
   const pageParam = searchParams.get('page')
   const limitParam = searchParams.get('limit')
   const qParam = searchParams.get('q')
+  const activeParam = searchParams.get('active')
 
   const hasPaginationParams =
-    pageParam !== null || limitParam !== null || (typeof qParam === 'string' && qParam.trim() !== '')
+    pageParam !== null ||
+    limitParam !== null ||
+    (typeof qParam === 'string' && qParam.trim() !== '') ||
+    (typeof activeParam === 'string' && activeParam.trim() !== '')
 
   if (!hasPaginationParams) {
     const products = await Product.find().sort({ createdAt: -1 }).lean()
@@ -73,8 +77,22 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(pageParam ?? '1') || 1)
   const limit = Math.min(50, Math.max(1, Number(limitParam ?? '9') || 9))
   const q = typeof qParam === 'string' ? qParam.trim() : ''
+  const active =
+    typeof activeParam === 'string'
+      ? activeParam.trim().toLowerCase() === 'true'
+        ? true
+        : activeParam.trim().toLowerCase() === 'false'
+          ? false
+          : undefined
+      : undefined
 
-  const filter = q ? { name: { $regex: escapeRegExp(q), $options: 'i' } } : {}
+  const filter: Record<string, unknown> = {}
+  if (q) {
+    filter.name = { $regex: escapeRegExp(q), $options: 'i' }
+  }
+  if (active !== undefined) {
+    filter.active = active
+  }
 
   const skip = (page - 1) * limit
   const [items, totalItems] = await Promise.all([

@@ -87,7 +87,7 @@ export default function WebNav() {
 
 	return (
 		<>
-			<header className="fixed inset-x-0 top-0 z-50 border-b border-emerald-500/30 bg-black/90 backdrop-blur">
+			<header className="fixed inset-x-0 top-0 z-50  bg-black/90 backdrop-blur">
 			<nav className="flex h-16 w-full items-center justify-between px-4 sm:px-6">
 				<Link
 					href="#home"
