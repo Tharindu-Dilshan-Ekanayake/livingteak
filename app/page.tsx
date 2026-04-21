@@ -1,9 +1,11 @@
 import WebNav from "@/components/WebNav";
 import Image from "next/image";
+import ProductsSection from "@/components/ProductsSection";
 import type { IconType } from "react-icons";
 import { FaGem, FaHeadset, FaPalette, FaTruckFast } from "react-icons/fa6";
 import BG from "../images/HomeScreen.webp";
 import BGMobile from "../images/HomeScreenMobileResponse.webp";
+import ProductBG from "../images/ProductBG.webp";
 
 const HOME_FEATURES: ReadonlyArray<{
   title: string;
@@ -31,6 +33,7 @@ const HOME_FEATURES: ReadonlyArray<{
     Icon: FaHeadset,
   },
 ];
+
 
 export default function Home() {
   return (
@@ -121,29 +124,25 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="h-px w-full bg-black" />
+        <div className=" w-full bg-black" />
 
-        <section id="products" className="min-h-svh scroll-mt-0 py-16 sm:py-24">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Product
-          </h2>
-          <p className="mt-4 max-w-2xl text-white/80">
-            Browse our teak collections — crafted for durability and everyday
-            comfort.
-          </p>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {["Chairs", "Tables", "Beds"].map((name) => (
-              <div
-                key={name}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5"
-              >
-                <p className="text-sm font-semibold text-emerald-300">{name}</p>
-                <p className="mt-2 text-sm text-white/75">
-                  Quality teak, clean finish, and long-lasting strength.
-                </p>
-              </div>
-            ))}
+        <section
+          id="products"
+          className="relative isolate min-h-svh scroll-mt-0 py-6 sm:py-10"
+        >
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={ProductBG}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black/70" />
+          </div>
+          <div className="relative z-10 px-4 sm:px-12">
+            <ProductsSection />
           </div>
         </section>
 
