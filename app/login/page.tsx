@@ -95,6 +95,13 @@ export default function LoginPage() {
           </button>
           {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
         </form>
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="text-sm text-emerald-600 hover:underline self-center"
+        >
+          Back to Website
+        </button>
       </div>
     </div>
   );
