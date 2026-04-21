@@ -87,12 +87,13 @@ export default function ProductCard({
       parsed.push({ id, name, price, quantity })
     }
     localStorage.setItem(CART_KEY, JSON.stringify(parsed))
+    window.dispatchEvent(new Event('local-storage'))
     setIsCartOpen(false)
   }
 
   return (
     <article className="group flex h-full min-h-55 flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-emerald-500/40">
-      <div className="relative h-28 w-full overflow-hidden bg-black/40 sm:h-36">
+      <div className="relative h-38 w-full overflow-hidden bg-black/40 sm:h-60">
         {displayImage ? (
           <img src={displayImage} alt={name} className="h-full w-full object-cover" />
         ) : (
@@ -113,9 +114,7 @@ export default function ProductCard({
           {price.toFixed(2)}
         </p>
 
-        {description ? (
-          <p className="text-xs text-white/70 line-clamp-2 sm:text-sm">{description}</p>
-        ) : null}
+       
 
         <div className="mt-auto flex gap-2">
           <button
@@ -201,14 +200,14 @@ export default function ProductCard({
       ) : null}
 
       {isCartOpen ? (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 ">
           <button
             type="button"
             aria-label="Close cart"
             className="fixed inset-0 bg-black/70"
             onClick={() => setIsCartOpen(false)}
           />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-black p-6 text-white shadow-lg">
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-emerald-500/40 bg-black p-6 text-white shadow-lg">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">Add to cart</h3>
