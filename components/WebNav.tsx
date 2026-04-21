@@ -242,7 +242,7 @@ export default function WebNav() {
 	return (
 		<>
 			<header className="fixed inset-x-0 top-0 z-50  bg-black/90 backdrop-blur">
-				<nav className="flex h-16 w-full items-center justify-between px-4 sm:px-6">
+				<nav className="flex h-20 w-full items-center justify-between px-4 sm:px-6">
 					<div className="flex items-center gap-3">
 						<button
 							type="button"

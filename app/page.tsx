@@ -12,28 +12,27 @@ const HOME_FEATURES: ReadonlyArray<{
   desc: string;
   Icon: IconType;
 }> = [
-  {
-    title: "Prime Quality",
-    desc: "Durable teak and clean finish.",
-    Icon: FaGem,
-  },
-  {
-    title: "Fast Work",
-    desc: "On-time delivery and support.",
-    Icon: FaTruckFast,
-  },
-  {
-    title: "Unique Art",
-    desc: "Modern, minimal wood designs.",
-    Icon: FaPalette,
-  },
-  {
-    title: "Top Support",
-    desc: "Friendly service from start.",
-    Icon: FaHeadset,
-  },
-];
-
+    {
+      title: "Prime Quality",
+      desc: "Durable teak and clean finish.",
+      Icon: FaGem,
+    },
+    {
+      title: "Fast Work",
+      desc: "On-time delivery and support.",
+      Icon: FaTruckFast,
+    },
+    {
+      title: "Unique Art",
+      desc: "Modern, minimal wood designs.",
+      Icon: FaPalette,
+    },
+    {
+      title: "Top Support",
+      desc: "Friendly service from start.",
+      Icon: FaHeadset,
+    },
+  ];
 
 export default function Home() {
   return (
@@ -148,34 +147,116 @@ export default function Home() {
 
         <div className="h-px w-full bg-black" />
 
-        <section id="about" className="min-h-svh scroll-mt-20 py-16 sm:py-24">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            About
-          </h2>
-          <p className="mt-4 max-w-2xl text-white/80">
-            We focus on authentic materials, careful craftsmanship, and
-            customer-first service.
-          </p>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {[
-              {
-                title: "Craftsmanship",
-                desc: "Built with attention to detail.",
-              },
-              { title: "Teak Quality", desc: "Strong wood, natural beauty." },
-              {
-                title: "Support",
-                desc: "Friendly help from order to delivery.",
-              },
-            ].map((card) => (
-              <div
-                key={card.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5"
-              >
-                <p className="text-sm font-semibold text-white">{card.title}</p>
-                <p className="mt-2 text-sm text-white/75">{card.desc}</p>
+        <section
+          id="about"
+          className="relative min-h-svh scroll-mt-0 py-8 sm:py-8 sm:px-4"
+        >
+          <div className="absolute inset-0 -z-10">
+            <div className="h-full w-full bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.12),_transparent_55%)]" />
+            <div className="absolute inset-0 bg-black/70" />
+          </div>
+
+          <div className="mx-auto w-full  px-4 sm:px-8">
+            <div>
+              <div className="max-w-xl">
+                <div className="border border-emerald-400 rounded-lg px-4 py-1  sm:w-30">
+                  <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                    About
+                  </h2>
+                </div>
               </div>
-            ))}
+              <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-16 xl:gap-24 mt-8">
+                <div className="flex-1 lg:max-w-2xl xl:max-w-3xl">
+                  <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-7xl">
+                    Mastering the art
+                    <span className="block bg-gradient-to-r from-emerald-300 to-emerald-500 bg-clip-text text-transparent mt-2 pb-2">
+                      of premium teak
+                    </span>
+                  </h2>
+                  <p className="mt-8 text-base leading-relaxed text-white/80 sm:text-lg">
+                    We don't just build furniture; we breathe life into raw timber. Every piece of teak is hand-selected and meticulously sculpted to create statement pieces that command attention and stand the test of time.
+                  </p>
+                  <p className="mt-4 text-base leading-relaxed text-white/70 sm:text-lg">
+                    Every piece that leaves our space carries a story of absolute dedication, careful sourcing, and uncompromising attention to detail.
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-3 lg:w-[450px] shrink-0">
+                  {[
+                    { label: "Projects", value: "10+" },
+                    { label: "Clients", value: "20+" },
+                    { label: "Years", value: "02" },
+                  ].map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="group flex flex-col justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20"
+                    >
+                      <p className="text-3xl font-bold text-emerald-300 drop-shadow-md group-hover:scale-105 transition-transform duration-300">
+                        {stat.value}
+                      </p>
+                      <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 group-hover:text-emerald-200 transition-colors">
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+
+            </div>
+
+            <div className="mt-12 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+              <div className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
+                <Image
+                  src={BG}
+                  alt="Workshop craftsmanship"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80" />
+              </div>
+              <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 lg:p-8 backdrop-blur-sm">
+                <div className="grid gap-4 sm:grid-cols-2 h-full content-center">
+                  {[
+                    {
+                      title: "Artisan Craftsmanship",
+                      desc: "Forged by hands mastering the subtle language of wood over decades.",
+                      icon: "✨"
+                    },
+                    {
+                      title: "Premium Teak",
+                      desc: "Exclusively using grade-A teak for rich oils and immortal durability.",
+                      icon: "💎"
+                    },
+                    {
+                      title: "Eco-Conscious",
+                      desc: "Luxury that respects the earth. All materials are ethically sourced.",
+                      icon: "🌱"
+                    },
+                    {
+                      title: "Bespoke Service",
+                      desc: "A white-glove experience from first inquiry to final installation.",
+                      icon: "🤝"
+                    },
+                  ].map((card) => (
+                    <div
+                      key={card.title}
+                      className="group flex flex-col gap-3 rounded-2xl border border-white/5 bg-black/40 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/10"
+                    >
+                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-xl group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all duration-300">
+                        {card.icon}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
+                          {card.title}
+                        </p>
+                        <p className="mt-1.5 text-xs leading-relaxed text-white/60 group-hover:text-white/80 transition-colors">
+                          {card.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
