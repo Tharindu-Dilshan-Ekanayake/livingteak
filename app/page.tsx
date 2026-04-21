@@ -71,7 +71,7 @@ export default function Home() {
                   <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
                     Living<span className="text-emerald-300">Teak</span>
                   </h1>
-                  <p className="text-sm font-medium text-white text-end">
+                  <p className="text-sm font-medium text-white text-start">
                     From wood to wow
                   </p>
                 </div>
@@ -94,24 +94,24 @@ export default function Home() {
             </div>
 
             <div className="mt-auto w-full  ">
-              <div className=" bg-black/60 px-6 py-8 text-center backdrop-blur ">
-                <p className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+              <div className=" bg-black/60 px-4 py-6 text-center backdrop-blur sm:px-6 sm:py-8">
+                <p className="text-3xl font-bold tracking-tight text-white sm:text-6xl">
                   Professional
                 </p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight text-emerald-300 sm:text-4xl">
+                <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-300 sm:text-4xl">
                   Carpentry Service
                 </p>
               </div>
             </div>
 
-            <div className="w-full bg-black/90 px-4 py-4 sm:px-6">
-              <div className="mx-auto grid max-w-4xl grid-cols-2 gap-1 text-center md:grid-cols-4">
+            <div className="w-full bg-black/90 px-4 py-3 sm:px-6">
+              <div className="mx-auto grid max-w-4xl grid-cols-2 gap-2 text-center md:grid-cols-4">
                 {HOME_FEATURES.map(({ title, Icon }) => (
-                  <div key={title} className="  py-1">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-emerald-500/50 bg-black/40">
-                      <Icon className="text-xl text-emerald-300" />
+                  <div key={title} className="py-1">
+                    <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border-2 border-emerald-500/50 bg-black/40 sm:h-14 sm:w-14">
+                      <Icon className="text-base text-emerald-300 sm:text-xl" />
                     </div>
-                    <p className="mt-4 text-sm font-semibold text-white">
+                    <p className="mt-3 text-xs font-semibold text-white sm:text-sm">
                       {title}
                     </p>
                   </div>
