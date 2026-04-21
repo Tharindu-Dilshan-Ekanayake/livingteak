@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 type ProductCardProps = {
   id: string
@@ -46,6 +46,21 @@ export default function ProductCard({
   const [details, setDetails] = useState<ProductDetails | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
+
+  useEffect(() => {
+    const isModalOpen = isViewOpen || isCartOpen || Boolean(imagePreview)
+    if (!isModalOpen) return
+
+    const previousBodyOverflow = document.body.style.overflow
+    const previousHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow
+      document.documentElement.style.overflow = previousHtmlOverflow
+    }
+  }, [imagePreview, isCartOpen, isViewOpen])
 
   const displayImage = imageUrl ?? details?.images?.[0] ?? ""
 
@@ -92,7 +107,18 @@ export default function ProductCard({
   }
 
   return (
-    <article className="group flex h-full min-h-55 flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-emerald-500/40">
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={openView}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          void openView()
+        }
+      }}
+      className="group flex h-full min-h-55 cursor-pointer flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-emerald-500/40"
+    >
       <div className="relative h-38 w-full overflow-hidden bg-black/40 sm:h-60">
         {displayImage ? (
           <img src={displayImage} alt={name} className="h-full w-full object-cover" />
@@ -119,14 +145,20 @@ export default function ProductCard({
         <div className="mt-auto flex gap-2">
           <button
             type="button"
-            onClick={openView}
+            onClick={(event) => {
+              event.stopPropagation()
+              void openView()
+            }}
             className="inline-flex w-full items-center justify-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-white/80 transition hover:border-emerald-500/40 hover:text-emerald-200"
           >
             View more
           </button>
           <button
             type="button"
-            onClick={openCart}
+            onClick={(event) => {
+              event.stopPropagation()
+              void openCart()
+            }}
             className="inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:border-emerald-400/70 hover:text-emerald-200"
           >
             Add to cart
@@ -135,64 +167,72 @@ export default function ProductCard({
       </div>
 
       {isViewOpen ? (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4" onClick={(event) => event.stopPropagation()}>
           <button
             type="button"
             aria-label="Close product details"
             className="fixed inset-0 bg-black/70"
-            onClick={() => setIsViewOpen(false)}
+            onClick={(event) => {
+              event.stopPropagation()
+              setIsViewOpen(false)
+            }}
           />
-          <div className="relative z-10 w-full max-w-2xl rounded-2xl border-1 border-emerald-500 bg-black p-6 text-white shadow-lg">
-            <div className="flex items-start justify-between gap-4">
+          <div className="relative z-10 w-full max-w-2xl rounded-2xl border border-emerald-500 bg-black text-white shadow-lg">
+            <div className="flex max-h-[85vh] flex-col overflow-y-auto p-6">
+              <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">{details?.name ?? name}</h3>
                 <p className="mt-1 text-sm text-emerald-300">{priceLabel}</p>
               </div>
               <button
                 type="button"
-                onClick={() => setIsViewOpen(false)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setIsViewOpen(false)
+                }}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70"
               >
                 ×
               </button>
-            </div>
-
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <div className="overflow-hidden rounded-xl border border-white/20 bg-black/40">
-                  {displayImage ? (
-                    <img
-                      src={displayImage}
-                      alt={details?.name ?? name}
-                      className="h-56 w-full object-cover"
-                      onClick={() => setImagePreview(displayImage)}
-                    />
-                  ) : null}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(details?.images ?? []).map((url) => (
-                    <button
-                      type="button"
-                      key={url}
-                      onClick={() => setImagePreview(url)}
-                      className="h-12 w-12 overflow-hidden rounded-lg border border-white/10"
-                    >
-                      <img src={url} alt="Product" className="h-full w-full object-cover" />
-                    </button>
-                  ))}
-                </div>
               </div>
-              <div>
-                <p className="text-sm text-white/70">
-                  {details?.description ?? description ?? "No description"}
-                </p>
-                <button
-                  type="button"
-                  onClick={openCart}
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:border-emerald-400/70 hover:text-emerald-200"
-                >
-                  Add to cart
-                </button>
+
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <div className="overflow-hidden rounded-xl border border-white/20 bg-black/40">
+                    {displayImage ? (
+                      <img
+                        src={displayImage}
+                        alt={details?.name ?? name}
+                        className="h-52 w-full object-cover sm:h-60"
+                        onClick={() => setImagePreview(displayImage)}
+                      />
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(details?.images ?? []).map((url) => (
+                      <button
+                        type="button"
+                        key={url}
+                        onClick={() => setImagePreview(url)}
+                        className="h-12 w-12 overflow-hidden rounded-lg border border-white/10"
+                      >
+                        <img src={url} alt="Product" className="h-full w-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm leading-relaxed text-white/70 whitespace-pre-line break-all [overflow-wrap:anywhere] max-h-40 overflow-y-auto sm:max-h-none">
+                    {details?.description ?? description ?? "No description"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:border-emerald-400/70 hover:text-emerald-200"
+                  >
+                    Add to cart
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -200,89 +240,103 @@ export default function ProductCard({
       ) : null}
 
       {isCartOpen ? (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 ">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 " onClick={(event) => event.stopPropagation()}>
           <button
             type="button"
             aria-label="Close cart"
             className="fixed inset-0 bg-black/70"
-            onClick={() => setIsCartOpen(false)}
+            onClick={(event) => {
+              event.stopPropagation()
+              setIsCartOpen(false)
+            }}
           />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-emerald-500/40 bg-black p-6 text-white shadow-lg">
-            <div className="flex items-start justify-between gap-4">
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-emerald-500/40 bg-black text-white shadow-lg">
+            <div className="flex max-h-[85vh] flex-col overflow-y-auto p-6">
+              <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">Add to cart</h3>
                 <p className="mt-1 text-sm text-white/70">{details?.name ?? name}</p>
               </div>
               <button
                 type="button"
-                onClick={() => setIsCartOpen(false)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setIsCartOpen(false)
+                }}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70"
               >
                 ×
               </button>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-              <span className="text-sm font-semibold text-white/80">Quantity</span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="h-8 w-8 rounded-full border border-white/10 text-white"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min={1}
-                  value={quantity}
-                  aria-label="Quantity"
-                  onChange={(event) => {
-                    const next = Math.max(1, Number(event.target.value) || 1)
-                    setQuantity(next)
-                  }}
-                  className="h-8 w-16 rounded-lg border border-white/10 bg-black/60 text-center text-sm text-white"
-                />
-                <button
-                  type="button"
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="h-8 w-8 rounded-full border border-white/10 text-white"
-                >
-                  +
-                </button>
               </div>
-            </div>
 
-            <div className="mt-4 flex items-center justify-between text-sm text-white/70">
-              <span>Total</span>
-              <span className="text-emerald-300">{currencyLabel} {(price * quantity).toFixed(2)}</span>
-            </div>
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                <span className="text-sm font-semibold text-white/80">Quantity</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    className="h-8 w-8 rounded-full border border-white/10 text-white"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    aria-label="Quantity"
+                    onChange={(event) => {
+                      const next = Math.max(1, Number(event.target.value) || 1)
+                      setQuantity(next)
+                    }}
+                    className="h-8 w-16 rounded-lg border border-white/10 bg-black/60 text-center text-sm text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="h-8 w-8 rounded-full border border-white/10 text-white"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
-            <button
-              type="button"
-              onClick={updateCart}
-              className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:border-emerald-400/70 hover:text-emerald-200"
-            >
-              Add to cart
-            </button>
+              <div className="mt-4 flex items-center justify-between text-sm text-white/70">
+                <span>Total</span>
+                <span className="text-emerald-300">{currencyLabel} {(price * quantity).toFixed(2)}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={updateCart}
+                className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-emerald-500/40 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:border-emerald-400/70 hover:text-emerald-200"
+              >
+                Add to cart
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
 
       {imagePreview ? (
-        <div className="fixed inset-0 z-70 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4" onClick={(event) => event.stopPropagation()}>
           <button
             type="button"
             aria-label="Close image"
             className="fixed inset-0 bg-black/70"
-            onClick={() => setImagePreview(null)}
+            onClick={(event) => {
+              event.stopPropagation()
+              setImagePreview(null)
+            }}
           />
           <div className="relative z-10 w-full max-w-5xl">
             <button
               type="button"
               aria-label="Close"
               className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-zinc-700 backdrop-blur"
-              onClick={() => setImagePreview(null)}
+              onClick={(event) => {
+                event.stopPropagation()
+                setImagePreview(null)
+              }}
             >
               ×
             </button>
