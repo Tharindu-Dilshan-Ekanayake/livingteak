@@ -1,224 +1,237 @@
+import WebNav from "@/components/WebNav";
+import Image from "next/image";
+import type { IconType } from "react-icons";
+import { FaGem, FaHeadset, FaPalette, FaTruckFast } from "react-icons/fa6";
+import BG from "../images/HomeScreen.webp";
+import BGMobile from "../images/HomeScreenMobileResponse.webp";
 
-'use client'
-
-import { useEffect, useMemo, useState } from 'react'
-import InputField from '@/components/InputField'
-
-type Product = {
-  _id: string
-  name: string
-  price: number
-}
+const HOME_FEATURES: ReadonlyArray<{
+  title: string;
+  desc: string;
+  Icon: IconType;
+}> = [
+  {
+    title: "Prime Quality",
+    desc: "Durable teak and clean finish.",
+    Icon: FaGem,
+  },
+  {
+    title: "Fast Work",
+    desc: "On-time delivery and support.",
+    Icon: FaTruckFast,
+  },
+  {
+    title: "Unique Art",
+    desc: "Modern, minimal wood designs.",
+    Icon: FaPalette,
+  },
+  {
+    title: "Top Support",
+    desc: "Friendly service from start.",
+    Icon: FaHeadset,
+  },
+];
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [name, setName] = useState('')
-  const [price, setPrice] = useState('')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [status, setStatus] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const isEditing = useMemo(() => Boolean(editingId), [editingId])
-
-  const loadProducts = async () => {
-    setLoading(true)
-    setStatus(null)
-    try {
-      const response = await fetch('/api/products', { cache: 'no-store' })
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data?.error ?? 'Failed to load products')
-      }
-      setProducts(data)
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Failed to load products')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      void loadProducts()
-    }, 0)
-    return () => clearTimeout(timeoutId)
-  }, [])
-
-  const resetForm = () => {
-    setName('')
-    setPrice('')
-    setEditingId(null)
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const payload = {
-      name: name.trim(),
-      price: Number(price),
-    }
-
-    if (!payload.name) {
-      setStatus('Product name is required')
-      return
-    }
-
-    if (!Number.isFinite(payload.price) || payload.price < 0) {
-      setStatus('Product price must be a number greater than or equal to 0')
-      return
-    }
-
-    try {
-      const response = await fetch(
-        editingId ? `/api/products/${editingId}` : '/api/products',
-        {
-          method: editingId ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }
-      )
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data?.error ?? 'Failed to save product')
-      }
-      setStatus(editingId ? 'Product updated' : 'Product added')
-      resetForm()
-      await loadProducts()
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Failed to save product')
-    }
-  }
-
-  const handleDelete = async (productId: string) => {
-    try {
-      const response = await fetch(`/api/products/${productId}`, {
-        method: 'DELETE',
-      })
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data?.error ?? 'Failed to delete product')
-      }
-      setStatus('Product deleted')
-      await loadProducts()
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Failed to delete product')
-    }
-  }
-
-  const startEdit = (product: Product) => {
-    setName(product.name)
-    setPrice(String(product.price))
-    setEditingId(product._id)
-  }
-
   return (
-    <div className="min-h-screen bg-zinc-50 px-6 py-12 text-zinc-900">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-        <header className="flex flex-col gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-600">
-            Woodmax Inventory
-          </p>
-          <h1 className="text-3xl font-semibold">Product CRUD</h1>
-          <p className="text-sm text-zinc-500">
-            Create, update, and delete products with a serverless API.
-          </p>
-        </header>
+    <div className="min-h-screen bg-black text-white">
+      <WebNav />
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
+      <main className="w-full  ">
+        <section
+          id="home"
+          className="relative isolate min-h-svh scroll-mt-20 overflow-hidden"
         >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <InputField
-                label="Product name"
-                name="name"
-                placeholder="Oak table"
-                value={name}
-                onChange={setName}
+          <div className="absolute inset-0 z-0">
+            <div className="relative h-full w-full">
+              <Image
+                src={BGMobile}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover sm:hidden"
               />
-            </div>
-            <div className="flex flex-col gap-2">
-              <InputField
-                label="Price"
-                name="price"
-                type="number"
-                placeholder="1200"
-                value={price}
-                onChange={setPrice}
+              <Image
+                src={BG}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="hidden object-cover sm:block"
               />
+              <div className="absolute inset-0 bg-black/60" />
             </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="submit"
-              className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500"
-            >
-              {isEditing ? 'Update product' : 'Add product'}
-            </button>
-            {isEditing ? (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300"
-              >
-                Cancel edit
-              </button>
-            ) : null}
-          </div>
-          {status ? <p className="text-sm text-zinc-600">{status}</p> : null}
-        </form>
-
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Current products</h2>
-            <button
-              type="button"
-              onClick={loadProducts}
-              className="rounded-full border border-zinc-200 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500"
-            >
-              Refresh
-            </button>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-            {loading ? (
-              <p className="px-6 py-8 text-sm text-zinc-500">Loading products...</p>
-            ) : products.length === 0 ? (
-              <p className="px-6 py-8 text-sm text-zinc-500">
-                No products yet. Add one above.
-              </p>
-            ) : (
-              <ul className="divide-y divide-zinc-200">
-                {products.map((product) => (
-                  <li key={product._id} className="flex flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-zinc-900">{product.name}</p>
-                      <p className="text-xs text-zinc-500">${product.price.toFixed(2)}</p>
+          <div className="relative z-10 flex min-h-svh flex-col">
+            <div className="w-full px-4 pt-40 sm:px-26 sm:pt-44">
+              <div className="flex flex-col items-center gap-6  ">
+                <div>
+                  <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
+                    Living<span className="text-emerald-300">Teak</span>
+                  </h1>
+                  <p className="text-sm font-medium text-white text-end">
+                    From wood to wow
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-black hover:bg-emerald-400"
+                  >
+                    Contact us
+                  </a>
+                  <a
+                    href="#products"
+                    className="inline-flex items-center rounded-xl border border-emerald-500/40 px-6 py-3 text-sm font-semibold text-white hover:border-emerald-400/70 hover:text-emerald-300"
+                  >
+                    View products
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-auto w-full  ">
+              <div className=" bg-black/60 px-6 py-8 text-center backdrop-blur ">
+                <p className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+                  Professional
+                </p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-emerald-300 sm:text-4xl">
+                  Carpentry Service
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full bg-black/90 px-4 py-4 sm:px-6">
+              <div className="mx-auto grid max-w-4xl grid-cols-2 gap-1 text-center md:grid-cols-4">
+                {HOME_FEATURES.map(({ title, Icon }) => (
+                  <div key={title} className="  py-1">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-emerald-500/50 bg-black/40">
+                      <Icon className="text-xl text-emerald-300" />
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(product)}
-                        className="rounded-full border border-emerald-200 px-4 py-1 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(product._id)}
-                        className="rounded-full border border-rose-200 px-4 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-300"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
+                    <p className="mt-4 text-sm font-semibold text-white">
+                      {title}
+                    </p>
+                  </div>
                 ))}
-              </ul>
-            )}
+              </div>
+            </div>
           </div>
         </section>
-      </div>
+
+        <div className="h-px w-full bg-black" />
+
+        <section id="products" className="min-h-svh scroll-mt-0 py-16 sm:py-24">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Product
+          </h2>
+          <p className="mt-4 max-w-2xl text-white/80">
+            Browse our teak collections — crafted for durability and everyday
+            comfort.
+          </p>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {["Chairs", "Tables", "Beds"].map((name) => (
+              <div
+                key={name}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              >
+                <p className="text-sm font-semibold text-emerald-300">{name}</p>
+                <p className="mt-2 text-sm text-white/75">
+                  Quality teak, clean finish, and long-lasting strength.
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="h-px w-full bg-black" />
+
+        <section id="about" className="min-h-svh scroll-mt-20 py-16 sm:py-24">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            About
+          </h2>
+          <p className="mt-4 max-w-2xl text-white/80">
+            We focus on authentic materials, careful craftsmanship, and
+            customer-first service.
+          </p>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                title: "Craftsmanship",
+                desc: "Built with attention to detail.",
+              },
+              { title: "Teak Quality", desc: "Strong wood, natural beauty." },
+              {
+                title: "Support",
+                desc: "Friendly help from order to delivery.",
+              },
+            ].map((card) => (
+              <div
+                key={card.title}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              >
+                <p className="text-sm font-semibold text-white">{card.title}</p>
+                <p className="mt-2 text-sm text-white/75">{card.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="h-px w-full bg-black" />
+
+        <section id="contact" className="min-h-svh scroll-mt-20 py-16 sm:py-24">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Contact us
+          </h2>
+          <p className="mt-4 max-w-2xl text-white/80">
+            Send us a message and we’ll get back to you.
+          </p>
+
+          <div className="mt-10 max-w-xl rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm">
+                <span className="text-white/80">Name</span>
+                <input
+                  className="h-11 rounded-xl border border-white/10 bg-black/40 px-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  placeholder="Your name"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span className="text-white/80">Email</span>
+                <input
+                  type="email"
+                  className="h-11 rounded-xl border border-white/10 bg-black/40 px-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  placeholder="you@example.com"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span className="text-white/80">Message</span>
+                <textarea
+                  className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  placeholder="Write your message"
+                />
+              </label>
+
+              <button
+                type="button"
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-500 px-5 text-sm font-semibold text-black hover:bg-emerald-400"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <footer className="py-10 text-sm text-white/60">
+          <div className="h-px w-full bg-white/10" />
+          <p className="mt-6">© {new Date().getFullYear()} LivingTeak</p>
+        </footer>
+      </main>
     </div>
-  )
+  );
 }

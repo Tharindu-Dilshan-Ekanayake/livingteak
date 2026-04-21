@@ -29,7 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full w-full overflow-x-hidden bg-zinc-50 flex flex-col">
+      <body className="min-h-full w-full overflow-x-hidden flex flex-col">
         <ToasterProvider />
         {children}
       </body>
