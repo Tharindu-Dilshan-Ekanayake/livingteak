@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       name,
       email,
       phone,
+      readStatus: false,
       message,
     });
 

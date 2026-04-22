@@ -94,10 +94,51 @@ function buildSubtotal(items: Array<{ price: number; quantity: number }>) {
   return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 }
 
-export async function GET() {
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export async function GET(request: Request) {
   await connectMongoose()
-  const orders = await Order.find().sort({ createdAt: -1 }).lean()
-  return NextResponse.json(orders)
+
+  const { searchParams } = new URL(request.url)
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+  const qParam = searchParams.get('q')
+  const statusParam = searchParams.get('status')
+
+  const hasPaginationParams =
+    pageParam !== null ||
+    limitParam !== null ||
+    (typeof qParam === 'string' && qParam.trim() !== '') ||
+    (typeof statusParam === 'string' && statusParam.trim() !== '')
+
+  if (!hasPaginationParams) {
+    const orders = await Order.find().sort({ createdAt: -1 }).lean()
+    return NextResponse.json(orders)
+  }
+
+  const page = Math.max(1, Number(pageParam ?? '1') || 1)
+  const limit = Math.min(50, Math.max(1, Number(limitParam ?? '10') || 10))
+  const q = typeof qParam === 'string' ? qParam.trim() : ''
+  const statusFilter = typeof statusParam === 'string' ? statusParam.trim().toLowerCase() : ''
+
+  const filter: Record<string, unknown> = {}
+  if (q) {
+    filter['customer.name'] = { $regex: escapeRegExp(q), $options: 'i' }
+  }
+  if (statusFilter && statusFilter !== 'all') {
+    filter.orderStatus = statusFilter
+  }
+
+  const skip = (page - 1) * limit
+  const [items, totalItems] = await Promise.all([
+    Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Order.countDocuments(filter),
+  ])
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit))
+  return NextResponse.json({ items, page, limit, totalItems, totalPages })
 }
 
 export async function POST(request: Request) {
