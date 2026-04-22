@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { FaPhone, FaEnvelope, FaLocationDot } from "react-icons/fa6";
 
 export default function ContactSection() {
     const [formData, setFormData] = useState({
@@ -48,59 +49,20 @@ export default function ContactSection() {
     };
 
     return (
-        <section id="contact" className="min-h-svh scroll-mt-20 py-16 sm:py-24 px-4 sm:px-8">
-            <div className="mx-auto w-full max-w-7xl">
-                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
-                    Contact us
-                </h2>
-                <p className="mt-4 max-w-2xl text-white/80">
+        <div className="w-full">
+            <div className="mx-auto w-full ">
+                <div className="max-w-xl">
+                    <div className="border border-emerald-400 rounded-lg px-4 py-1  sm:w-48">
+                        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                            Contact Us
+                        </h2>
+                    </div>
+                </div>
+                <p className="mt-4  text-white/80">
                     Get in touch with us for inquiries, custom orders, or any questions. We’re here to help you turn wood into wow.
                 </p>
 
                 <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:gap-16">
-                    {/* Contact Details & Map */}
-                    <div className="flex flex-col gap-8">
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                            <div className="mb-6 grid gap-6">
-                                <div>
-                                    <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-300">
-                                        Phone
-                                    </h3>
-                                    <p className="mt-2 text-xl font-medium text-white transition-colors hover:text-emerald-400">
-                                        <a href="tel:071021694">071021694</a>
-                                    </p>
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-300">
-                                        Email
-                                    </h3>
-                                    <p className="mt-2 text-lg font-medium text-white transition-colors hover:text-emerald-400">
-                                        <a href="mailto:dlshantharindu8@gmail.com">dlshantharindu8@gmail.com</a>
-                                    </p>
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-300">
-                                        Address
-                                    </h3>
-                                    <p className="mt-2 max-w-xs text-lg font-medium text-white leading-relaxed">
-                                        Gallenbindunuwewa, Sri Lanka
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="overflow-hidden rounded-xl border border-white/10">
-                                <iframe
-                                    width="100%"
-                                    height="250"
-                                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
-                                    loading="lazy"
-                                    allowFullScreen
-                                    src="https://maps.google.com/maps?q=Galenbindunuwewa&t=&z=11&ie=UTF8&iwloc=&output=embed"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Contact Form */}
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8 backdrop-blur-sm">
                         <form onSubmit={handleSubmit} className="grid gap-6">
@@ -163,8 +125,52 @@ export default function ContactSection() {
                             </button>
                         </form>
                     </div>
+                    {/* Contact Details & Map */}
+                    <div className="flex flex-col gap-8">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                            <div className="mb-6 grid gap-6">
+                                <div>
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-emerald-300">
+                                        <FaPhone className="text-emerald-400" /> Phone
+                                    </h3>
+                                    <p className="mt-2 text-xl font-medium text-white transition-colors hover:text-emerald-400 border-b border-white/10 pb-1">
+                                        <a href="tel:071021694">071021694</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-emerald-300">
+                                        <FaEnvelope className="text-emerald-400" /> Email
+                                    </h3>
+                                    <p className="mt-2 text-lg font-medium text-white transition-colors hover:text-emerald-400 border-b border-white/10 pb-1">
+                                        <a href="mailto:dlshantharindu8@gmail.com">dlshantharindu8@gmail.com</a>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-emerald-300">
+                                        <FaLocationDot className="text-emerald-400" /> Address
+                                    </h3>
+                                    <p className="mt-2 max-w-xs text-lg font-medium text-white leading-relaxed">
+                                        Gallenbindunuwewa, Sri Lanka
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="overflow-hidden rounded-xl border border-white/10">
+                                <iframe
+                                    width="100%"
+                                    height="250"
+                                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
+                                    loading="lazy"
+                                    allowFullScreen
+                                    src="https://maps.google.com/maps?q=Galenbindunuwewa&t=&z=11&ie=UTF8&iwloc=&output=embed"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
-        </section>
+        </div>
     );
 }

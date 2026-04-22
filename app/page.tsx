@@ -2,11 +2,13 @@ import WebNav from "@/components/WebNav";
 import Image from "next/image";
 import ProductsSection from "@/components/ProductsSection";
 import ContactSection from "@/components/ContactSection";
+import Footer from "@/components/Footer";
 import type { IconType } from "react-icons";
 import { FaGem, FaHeadset, FaPalette, FaTruckFast } from "react-icons/fa6";
 import BG from "../images/HomeScreen.webp";
 import BGMobile from "../images/HomeScreenMobileResponse.webp";
 import ProductBG from "../images/ProductBG.webp";
+import ContactBG from "../images/ContactBG.webp"
 
 const HOME_FEATURES: ReadonlyArray<{
   title: string;
@@ -263,12 +265,27 @@ export default function Home() {
 
         <div className="h-px w-full bg-black" />
 
-        <ContactSection />
+        <section
+          id="contact"
+          className="relative isolate min-h-svh scroll-mt-0 py-16 sm:py-8 "
+        >
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={ContactBG}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-black/70" />
+          </div>
+          <div className="relative z-10 px-4 sm:px-12">
+            <ContactSection />
+          </div>
+        </section>
 
-        <footer className="py-10 text-sm text-white/60">
-          <div className="h-px w-full bg-white/10" />
-          <p className="mt-6">© {new Date().getFullYear()} LivingTeak</p>
-        </footer>
+        <Footer />
       </main>
     </div>
   );
