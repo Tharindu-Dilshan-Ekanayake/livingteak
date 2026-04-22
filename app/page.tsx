@@ -1,6 +1,7 @@
 import WebNav from "@/components/WebNav";
 import Image from "next/image";
 import ProductsSection from "@/components/ProductsSection";
+import ContactSection from "@/components/ContactSection";
 import type { IconType } from "react-icons";
 import { FaGem, FaHeadset, FaPalette, FaTruckFast } from "react-icons/fa6";
 import BG from "../images/HomeScreen.webp";
@@ -262,50 +263,7 @@ export default function Home() {
 
         <div className="h-px w-full bg-black" />
 
-        <section id="contact" className="min-h-svh scroll-mt-20 py-16 sm:py-24">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Contact us
-          </h2>
-          <p className="mt-4 max-w-2xl text-white/80">
-            Send us a message and we’ll get back to you.
-          </p>
-
-          <div className="mt-10 max-w-xl rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="grid gap-4">
-              <label className="grid gap-2 text-sm">
-                <span className="text-white/80">Name</span>
-                <input
-                  className="h-11 rounded-xl border border-white/10 bg-black/40 px-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  placeholder="Your name"
-                />
-              </label>
-
-              <label className="grid gap-2 text-sm">
-                <span className="text-white/80">Email</span>
-                <input
-                  type="email"
-                  className="h-11 rounded-xl border border-white/10 bg-black/40 px-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  placeholder="you@example.com"
-                />
-              </label>
-
-              <label className="grid gap-2 text-sm">
-                <span className="text-white/80">Message</span>
-                <textarea
-                  className="min-h-28 resize-y rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  placeholder="Write your message"
-                />
-              </label>
-
-              <button
-                type="button"
-                className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-500 px-5 text-sm font-semibold text-black hover:bg-emerald-400"
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </section>
+        <ContactSection />
 
         <footer className="py-10 text-sm text-white/60">
           <div className="h-px w-full bg-white/10" />
