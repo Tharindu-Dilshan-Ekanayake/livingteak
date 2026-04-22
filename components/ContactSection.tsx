@@ -134,7 +134,7 @@ export default function ContactSection() {
                                         <FaPhone className="text-emerald-400" /> Phone
                                     </h3>
                                     <p className="mt-2 text-xl font-medium text-white transition-colors hover:text-emerald-400 border-b border-white/10 pb-1">
-                                        <a href="tel:071021694">071021694</a>
+                                        <a href="tel:0710821694">0710821694</a>
                                     </p>
                                 </div>
                                 <div>
@@ -142,7 +142,7 @@ export default function ContactSection() {
                                         <FaEnvelope className="text-emerald-400" /> Email
                                     </h3>
                                     <p className="mt-2 text-lg font-medium text-white transition-colors hover:text-emerald-400 border-b border-white/10 pb-1">
-                                        <a href="mailto:dlshantharindu8@gmail.com">dlshantharindu8@gmail.com</a>
+                                        <a href="mailto:livingteak@gmail.com">livingteak@gmail.com</a>
                                     </p>
                                 </div>
                                 <div>
