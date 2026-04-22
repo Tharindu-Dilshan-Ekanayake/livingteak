@@ -267,7 +267,7 @@ export default function Home() {
 
         <section
           id="contact"
-          className="relative isolate min-h-svh scroll-mt-0 py-16 sm:py-8 "
+          className="relative isolate min-h-svh scroll-mt-0 py-8 sm:py-8 "
         >
           <div className="absolute inset-0 z-0">
             <Image
