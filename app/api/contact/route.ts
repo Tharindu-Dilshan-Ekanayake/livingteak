@@ -3,6 +3,21 @@ import { connectMongoose } from "@/lib/mongoose";
 import { Contact } from "@/models/Contact";
 import nodemailer from "nodemailer";
 
+export async function GET() {
+  try {
+    await connectMongoose();
+    const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
+
+    return NextResponse.json(contacts);
+  } catch (error) {
+    console.error("Error loading contact messages:", error);
+    return NextResponse.json(
+      { error: "Failed to load contact messages." },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { name, email, phone, message } = await req.json();
@@ -54,7 +69,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, contact: newContact }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error submitting contact form:", error);
     return NextResponse.json(
       { error: "Failed to submit contact form. Please try again later." },
