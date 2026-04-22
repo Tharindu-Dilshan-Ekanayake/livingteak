@@ -1,11 +1,19 @@
-export default function AdminMessagesPage() {
+import AdminHeader from "@/components/AdminHeader";
+import AdminMessagesClient from "@/components/AdminMessagesClient";
+import { connectMongoose } from "@/lib/mongoose";
+import { Contact } from "@/models/Contact";
+
+export default async function AdminMessagesPage() {
+  await connectMongoose();
+  const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
+
   return (
-    <div className="flex w-full flex-col gap-2 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-600">
-        Messages
-      </p>
-      <h1 className="text-2xl font-semibold">Messages</h1>
-      <p className="text-sm text-zinc-500">Read and respond to messages here.</p>
+    <div className="flex flex-col gap-6">
+      <header>
+        <AdminHeader label="Messages" />
+      </header>
+
+      <AdminMessagesClient initialMessages={JSON.parse(JSON.stringify(contacts))} />
     </div>
-  )
+  );
 }
