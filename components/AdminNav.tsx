@@ -13,6 +13,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Products', href: '/admin/products' },
   { label: 'Order', href: '/admin/orders' },
   { label: 'Messages', href: '/admin/messages' },
+  { label: 'Settings', href: '/admin/settings' },
 ]
 
 export default function AdminNav({ onNavigate }: { onNavigate?: () => void } = {}) {
