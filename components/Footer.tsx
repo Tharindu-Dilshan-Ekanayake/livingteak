@@ -62,11 +62,11 @@ export default function Footer() {
                         <ul className="mt-6 space-y-4 text-sm text-white/60">
                             <li>
                                 <span className="block text-white/40 mb-1">Phone</span>
-                                <a href="tel:071021694" className="hover:text-emerald-400 transition-colors">071021694</a>
+                                <a href="tel:0764783031" className="hover:text-emerald-400 transition-colors">076 478 3031</a>
                             </li>
                             <li>
                                 <span className="block text-white/40 mb-1">Email</span>
-                                <a href="mailto:dlshantharindu8@gmail.com" className="hover:text-emerald-400 transition-colors">dlshantharindu8@gmail.com</a>
+                                <a href="mailto:woodmaxlk@gmail.com" className="hover:text-emerald-400 transition-colors">woodmaxlk@gmail.com</a>
                             </li>
                             <li>
                                 <span className="block text-white/40 mb-1">Address</span>
