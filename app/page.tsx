@@ -3,6 +3,8 @@ import Image from "next/image";
 import ProductsSection from "@/components/ProductsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import AboutStats from "@/components/AboutStats";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import type { IconType } from "react-icons";
 import { FaGem, FaHeadset, FaPalette, FaTruckFast } from "react-icons/fa6";
 import BG from "../images/HomeScreen.webp";
@@ -177,31 +179,13 @@ export default function Home() {
                     </span>
                   </h2>
                   <p className="mt-8 text-base leading-relaxed text-white/80 sm:text-lg">
-                    We don't just build furniture; we breathe life into raw timber. Every piece of teak is hand-selected and meticulously sculpted to create statement pieces that command attention and stand the test of time.
+                    We don&apos;t just build furniture; we breathe life into raw timber. Every piece of teak is hand-selected and meticulously sculpted to create statement pieces that command attention and stand the test of time.
                   </p>
                   <p className="mt-4 text-base leading-relaxed text-white/70 sm:text-lg">
                     Every piece that leaves our space carries a story of absolute dedication, careful sourcing, and uncompromising attention to detail.
                   </p>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-3 lg:w-[450px] shrink-0">
-                  {[
-                    { label: "Projects", value: "10+" },
-                    { label: "Clients", value: "20+" },
-                    { label: "Years", value: "02" },
-                  ].map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="group flex flex-col justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:shadow-xl hover:shadow-emerald-500/20"
-                    >
-                      <p className="text-3xl font-bold text-emerald-300 drop-shadow-md group-hover:scale-105 transition-transform duration-300">
-                        {stat.value}
-                      </p>
-                      <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 group-hover:text-emerald-200 transition-colors">
-                        {stat.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                <AboutStats />
               </div>
 
 
@@ -260,6 +244,8 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            <TestimonialsSection />
           </div>
         </section>
 

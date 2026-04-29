@@ -179,7 +179,7 @@ export default function WebNav() {
 
 	useEffect(() => {
 		if (!isCartOpen) return
-		setIsOrderFormOpen(false)
+		queueMicrotask(() => setIsOrderFormOpen(false))
 
 		const previousBodyOverflow = document.body.style.overflow
 		const previousHtmlOverflow = document.documentElement.style.overflow
@@ -194,7 +194,7 @@ export default function WebNav() {
 
 	useEffect(() => {
 		if (cartItems.length > 0) return
-		setIsOrderFormOpen(false)
+		queueMicrotask(() => setIsOrderFormOpen(false))
 	}, [cartItems.length])
 
 	useEffect(() => {
