@@ -5,6 +5,7 @@ const ProductSchema = new Schema(
     name: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     description: { type: String, required: true},
+    category: { type: String, required: true, trim: true },
     images: { type: [String], default: [] },
     active: { type: Boolean, default: true },
   },
@@ -22,6 +23,12 @@ if (existingModel && !existingModel.schema.path('images')) {
 if (existingModel && !existingModel.schema.path('description')) {
   existingModel.schema.add({
     description: { type: String, required: true },
+  })
+}
+
+if (existingModel && !existingModel.schema.path('category')) {
+  existingModel.schema.add({
+    category: { type: String, required: true, trim: true },
   })
 }
 

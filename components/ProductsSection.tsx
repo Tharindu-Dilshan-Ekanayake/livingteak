@@ -11,6 +11,7 @@ type ProductsPageResponse = {
     name: string;
     price: number;
     description?: string;
+    category?: string;
     images?: string[];
     active?: boolean;
   }>;
@@ -20,9 +21,15 @@ type ProductsPageResponse = {
   totalPages: number;
 };
 
+type CategoriesResponse = {
+  items: Array<{ name?: string }>;
+};
+
 export default function ProductsSection() {
   const [items, setItems] = useState<ProductCardItem[]>([]);
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [categories, setCategories] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -46,6 +53,7 @@ export default function ProductsSection() {
           params.set("limit", String(PAGE_SIZE));
           params.set("active", "true");
           if (trimmedQuery) params.set("q", trimmedQuery);
+          if (category !== "all") params.set("category", category);
 
           const response = await fetch(`/api/products?${params.toString()}`, {
             cache: "no-store",
@@ -58,6 +66,7 @@ export default function ProductsSection() {
           const mapped = (Array.isArray(data?.items) ? data.items : []).map((product) => ({
             id: product._id,
             name: product.name,
+            category: product.category,
             price: product.price,
             description: product.description,
             imageUrl: product.images?.[0],
@@ -78,7 +87,31 @@ export default function ProductsSection() {
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [page, trimmedQuery]);
+  }, [page, trimmedQuery, category]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetch("/api/categories?active=true", {
+          cache: "no-store",
+        });
+        const data = (await response.json()) as CategoriesResponse;
+        if (!response.ok) {
+          throw new Error((data as unknown as { error?: string })?.error ?? "Failed to load categories");
+        }
+        const names = Array.isArray(data?.items)
+          ? data.items
+              .map((item) => (typeof item?.name === "string" ? item.name : ""))
+              .filter(Boolean)
+          : [];
+        setCategories(names);
+      } catch {
+        setCategories([]);
+      }
+    };
+
+    void loadCategories();
+  }, []);
 
   useEffect(() => {
     if (!hasPagedRef.current) return;
@@ -93,19 +126,42 @@ export default function ProductsSection() {
           
         </div>
 
-        <div className="w-full md:max-w-sm">
-          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
-            Search
-          </label>
-          <input
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setPage(1);
-            }}
-            placeholder="Search products..."
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-emerald-400"
-          />
+        <div className="flex w-full flex-col gap-3 md:max-w-lg md:flex-row md:items-end">
+          <div className="w-full">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+              Search
+            </label>
+            <input
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
+              placeholder="Search products..."
+              className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-emerald-400"
+            />
+          </div>
+
+          <div className="w-full">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(event) => {
+                setCategory(event.target.value);
+                setPage(1);
+              }}
+              className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2 text-sm text-white outline-none transition focus:border-emerald-400"
+            >
+              <option value="all">All categories</option>
+              {categories.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react"
 type ProductCardProps = {
   id: string
   name: string
+  category?: string
   price: number
   description?: string
   imageUrl?: string
@@ -20,6 +21,7 @@ type ProductDetails = {
   price: number
   description?: string
   images?: string[]
+  category?: string
 }
 
 type CartItem = {
@@ -34,6 +36,7 @@ const CART_KEY = "woodmax_cart"
 export default function ProductCard({
   id,
   name,
+  category,
   price,
   description,
   imageUrl,
@@ -131,8 +134,14 @@ export default function ProductCard({
 
       <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold leading-tight text-white sm:text-base">{name}</h3>
-          
+          <div>
+            <h3 className="text-sm font-semibold leading-tight text-white sm:text-base">{name}</h3>
+            {category ? (
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-300/80">
+                {category}
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <p className="text-xs text-white/80 sm:text-sm">
@@ -182,6 +191,11 @@ export default function ProductCard({
               <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold">{details?.name ?? name}</h3>
+                {details?.category || category ? (
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300/80">
+                    {details?.category ?? category}
+                  </p>
+                ) : null}
                 <p className="mt-1 text-sm text-emerald-300">{priceLabel}</p>
               </div>
               <button
