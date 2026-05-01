@@ -3,6 +3,7 @@ import ProductCard from '@/components/ProductCard'
 export type ProductCardItem = {
   id: string
   name: string
+  category?: string
   price: number
   description?: string
   imageUrl?: string
@@ -38,6 +39,7 @@ export default function ProductsSet({
               key={item.id}
               id={item.id}
               name={item.name}
+              category={item.category}
               price={item.price}
               description={item.description}
               imageUrl={item.imageUrl}

@@ -1,24 +1,31 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import { connectMongoose } from '@/lib/mongoose'
+import Category from '@/models/Category'
 import Product from '@/models/Product'
 
 type RouteParams = { params: Promise<{ id: string }> }
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 function parseProduct(body: unknown) {
   if (!body || typeof body !== 'object') {
     return { error: 'Body must be a JSON object' }
   }
 
-  const { name, description, price, images, active } = body as {
+  const { name, description, price, category, images, active } = body as {
     name?: unknown
     description?: unknown
+    category?: unknown
     price?: unknown
     images?: unknown
     active?: unknown
   }
   const parsedName = typeof name === 'string' ? name.trim() : ''
   const parsedDescription = typeof description === 'string' ? description.trim() : ''
+  const parsedCategory = typeof category === 'string' ? category.trim() : ''
   const parsedPrice =
     typeof price === 'number' ? price : typeof price === 'string' ? Number(price) : NaN
 
@@ -39,6 +46,10 @@ function parseProduct(body: unknown) {
     return { error: 'Product description is required' }
   }
 
+  if (!parsedCategory) {
+    return { error: 'Product category is required' }
+  }
+
   if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
     return { error: 'Product price must be a number greater than or equal to 0' }
   }
@@ -46,6 +57,7 @@ function parseProduct(body: unknown) {
   const value: Record<string, unknown> = {
     name: parsedName,
     description: parsedDescription,
+    category: parsedCategory,
     price: parsedPrice,
   }
   if (parsedImages) value.images = parsedImages
@@ -87,6 +99,16 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const parsed = parseProduct(body)
   if ('error' in parsed) {
     return NextResponse.json({ error: parsed.error }, { status: 400 })
+  }
+
+  const categoryName = (parsed.value as { category?: string }).category
+  if (typeof categoryName === 'string') {
+    const category = await Category.findOne({
+      name: { $regex: `^${escapeRegExp(categoryName)}$`, $options: 'i' },
+    }).lean()
+    if (!category) {
+      return NextResponse.json({ error: 'Category not found' }, { status: 400 })
+    }
   }
 
   await connectMongoose()

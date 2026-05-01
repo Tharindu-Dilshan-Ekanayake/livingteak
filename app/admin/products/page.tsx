@@ -10,6 +10,7 @@ type Product = {
   name: string;
   price: number;
   description: string;
+  category?: string;
   images?: string[];
   active?: boolean;
 };
@@ -74,6 +75,7 @@ export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -92,9 +94,11 @@ export default function AdminProductsPage() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [active, setActive] = useState(true);
+  const [categories, setCategories] = useState<string[]>([]);
 
   const previews = useMemo(() => {
     return files.map((file) => ({
@@ -119,7 +123,11 @@ export default function AdminProductsPage() {
     totalPages: number;
   };
 
-  const loadProducts = useCallback(async (nextPage: number, nextQuery: string) => {
+  type CategoriesResponse = {
+    items: Array<{ name?: string }>;
+  };
+
+  const loadProducts = useCallback(async (nextPage: number, nextQuery: string, nextCategory: string) => {
     setLoading(true);
     try {
       const searchParams = new URLSearchParams();
@@ -127,6 +135,9 @@ export default function AdminProductsPage() {
       searchParams.set("limit", String(PAGE_SIZE));
       if (nextQuery.trim()) {
         searchParams.set("q", nextQuery.trim());
+      }
+      if (nextCategory !== "all") {
+        searchParams.set("category", nextCategory);
       }
 
       const response = await fetch(`/api/products?${searchParams.toString()}`, {
@@ -147,12 +158,36 @@ export default function AdminProductsPage() {
     }
   }, [PAGE_SIZE]);
 
+  const loadCategories = useCallback(async () => {
+    try {
+      const response = await fetch("/api/categories", {
+        cache: "no-store",
+      });
+      const data: CategoriesResponse = await response.json();
+      if (!response.ok) {
+        throw new Error((data as unknown as { error?: string })?.error ?? "Failed to load categories");
+      }
+      const names = Array.isArray(data?.items)
+        ? data.items
+            .map((item) => (typeof item?.name === "string" ? item.name : ""))
+            .filter(Boolean)
+        : [];
+      setCategories(names);
+    } catch {
+      setCategories([]);
+    }
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      void loadProducts(page, query);
+      void loadProducts(page, query, categoryFilter);
     }, 0);
     return () => clearTimeout(timeoutId);
-  }, [loadProducts, page, query]);
+  }, [loadProducts, page, query, categoryFilter]);
+
+  useEffect(() => {
+    void loadCategories();
+  }, [loadCategories]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -178,6 +213,7 @@ export default function AdminProductsPage() {
     setName("");
     setPrice("");
     setDescription("");
+    setCategory("");
     setFiles([]);
     setExistingImages([]);
     setActive(true);
@@ -190,6 +226,7 @@ export default function AdminProductsPage() {
     setName(product.name);
     setPrice(String(product.price));
     setDescription(product.description ?? "");
+    setCategory(product.category ?? "");
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
@@ -202,6 +239,7 @@ export default function AdminProductsPage() {
     setName(product.name);
     setPrice(String(product.price));
     setDescription(product.description ?? "");
+    setCategory(product.category ?? "");
     setFiles([]);
     setExistingImages(Array.isArray(product.images) ? product.images : []);
     setActive(product.active !== false);
@@ -254,6 +292,7 @@ export default function AdminProductsPage() {
 
     const parsedName = name.trim();
     const parsedDescription = description.trim();
+    const parsedCategory = category.trim();
     const parsedPrice = Number(price);
 
     if (!parsedName) {
@@ -263,6 +302,11 @@ export default function AdminProductsPage() {
 
     if (!parsedDescription) {
       toast.error("Product description is required");
+      return;
+    }
+
+    if (!parsedCategory) {
+      toast.error("Product category is required");
       return;
     }
 
@@ -306,6 +350,7 @@ export default function AdminProductsPage() {
         body: JSON.stringify({
           name: parsedName,
           description: parsedDescription,
+          category: parsedCategory,
           price: parsedPrice,
           images: imagesToSave,
           active,
@@ -318,7 +363,8 @@ export default function AdminProductsPage() {
 
       toast.success(modalMode === "edit" ? "Product updated" : "Product created");
       closeModal();
-      await loadProducts(page, query);
+      await loadProducts(page, query, categoryFilter);
+      await loadCategories();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to save product");
     } finally {
@@ -336,7 +382,7 @@ export default function AdminProductsPage() {
       if (!response.ok)
         throw new Error(data?.error ?? "Failed to delete product");
       toast.success("Product deleted");
-      await loadProducts(page, query);
+      await loadProducts(page, query, categoryFilter);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete product");
     } finally {
@@ -375,6 +421,27 @@ export default function AdminProductsPage() {
             />
           </div>
 
+          <div className="w-full md:max-w-xs">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Category
+            </label>
+            <select
+              value={categoryFilter}
+              onChange={(event) => {
+                setCategoryFilter(event.target.value);
+                setPage(1);
+              }}
+              className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400"
+            >
+              <option value="all">All categories</option>
+              {categories.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
@@ -385,7 +452,7 @@ export default function AdminProductsPage() {
             </button>
             <button
               type="button"
-              onClick={() => loadProducts(page, query)}
+              onClick={() => loadProducts(page, query, categoryFilter)}
               className="rounded-full border border-zinc-200 px-4 py-2 text-xs font-semibold text-zinc-700 transition hover:border-zinc-300 md:px-5 md:text-sm"
             >
               Refresh
@@ -423,6 +490,9 @@ export default function AdminProductsPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-zinc-900">
                         {product.name}
+                      </p>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                        {product.category || "Uncategorized"}
                       </p>
                       <p className="mt-1 text-sm text-zinc-700">
                         ${product.price.toFixed(2)}
@@ -490,6 +560,9 @@ export default function AdminProductsPage() {
                   Price
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                  Category
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
                   Status
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
@@ -500,13 +573,13 @@ export default function AdminProductsPage() {
             <tbody className="divide-y divide-zinc-200 bg-white">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-zinc-500">
+                  <td colSpan={6} className="px-4 py-6 text-zinc-500">
                     Loading...
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-zinc-500">
+                  <td colSpan={6} className="px-4 py-6 text-zinc-500">
                     No products found.
                   </td>
                 </tr>
@@ -529,6 +602,9 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-3 text-zinc-700">
                       <span className="text-xs font-semibold text-emerald-600">LKR </span>{product.price.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 text-zinc-700">
+                      {product.category || "Uncategorized"}
                     </td>
                     <td className="px-4 py-3">
                       {product.active === false ? (
@@ -652,6 +728,35 @@ export default function AdminProductsPage() {
                   value={price}
                   onChange={isReadOnly ? undefined : setPrice}
                 />
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="modal_category"
+                    className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500"
+                  >
+                    Category
+                  </label>
+                  <input
+                    id="modal_category"
+                    name="modal_category"
+                    list="product-categories"
+                    placeholder="Outdoor"
+                    value={category}
+                    readOnly={isReadOnly}
+                    onChange={
+                      isReadOnly
+                        ? undefined
+                        : (event) => {
+                            setCategory(event.target.value);
+                          }
+                    }
+                    className="rounded-xl border border-zinc-200 px-4 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-400"
+                  />
+                  <datalist id="product-categories">
+                    {categories.map((value) => (
+                      <option key={value} value={value} />
+                    ))}
+                  </datalist>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">

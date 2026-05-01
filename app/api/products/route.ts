@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectMongoose } from '@/lib/mongoose'
+import Category from '@/models/Category'
 import Product from '@/models/Product'
 
 function escapeRegExp(value: string) {
@@ -11,15 +12,17 @@ function parseProduct(body: unknown) {
     return { error: 'Body must be a JSON object' }
   }
 
-  const { name, description, price, images, active } = body as {
+  const { name, description, price, category, images, active } = body as {
     name?: unknown
     description?: unknown
+    category?: unknown
     price?: unknown
     images?: unknown
     active?: unknown
   }
   const parsedName = typeof name === 'string' ? name.trim() : ''
   const parsedDescription = typeof description === 'string' ? description.trim() : ''
+  const parsedCategory = typeof category === 'string' ? category.trim() : ''
   const parsedPrice =
     typeof price === 'number' ? price : typeof price === 'string' ? Number(price) : NaN
 
@@ -40,6 +43,10 @@ function parseProduct(body: unknown) {
     return { error: 'Product description is required' }
   }
 
+  if (!parsedCategory) {
+    return { error: 'Product category is required' }
+  }
+
   if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
     return { error: 'Product price must be a number greater than or equal to 0' }
   }
@@ -47,6 +54,7 @@ function parseProduct(body: unknown) {
   const value: Record<string, unknown> = {
     name: parsedName,
     description: parsedDescription,
+    category: parsedCategory,
     price: parsedPrice,
   }
   if (parsedImages) value.images = parsedImages
@@ -62,21 +70,22 @@ export async function GET(request: Request) {
   const limitParam = searchParams.get('limit')
   const qParam = searchParams.get('q')
   const activeParam = searchParams.get('active')
+  const categoryParam = searchParams.get('category')
+  const distinctParam = searchParams.get('distinct')
 
   const hasPaginationParams =
     pageParam !== null ||
     limitParam !== null ||
     (typeof qParam === 'string' && qParam.trim() !== '') ||
-    (typeof activeParam === 'string' && activeParam.trim() !== '')
+    (typeof activeParam === 'string' && activeParam.trim() !== '') ||
+    (typeof categoryParam === 'string' && categoryParam.trim() !== '') ||
+    (typeof distinctParam === 'string' && distinctParam.trim() !== '')
 
   if (!hasPaginationParams) {
     const products = await Product.find().sort({ createdAt: -1 }).lean()
     return NextResponse.json(products)
   }
 
-  const page = Math.max(1, Number(pageParam ?? '1') || 1)
-  const limit = Math.min(50, Math.max(1, Number(limitParam ?? '9') || 9))
-  const q = typeof qParam === 'string' ? qParam.trim() : ''
   const active =
     typeof activeParam === 'string'
       ? activeParam.trim().toLowerCase() === 'true'
@@ -86,9 +95,31 @@ export async function GET(request: Request) {
           : undefined
       : undefined
 
+  const category = typeof categoryParam === 'string' ? categoryParam.trim() : ''
+
+  if (distinctParam?.trim() === 'category') {
+    const distinctFilter: Record<string, unknown> = {}
+    if (active !== undefined) {
+      distinctFilter.active = active
+    }
+    const categories = await Product.distinct('category', distinctFilter)
+    const cleaned = categories
+      .filter((value): value is string => typeof value === 'string')
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+    return NextResponse.json({ categories: cleaned })
+  }
+
+  const page = Math.max(1, Number(pageParam ?? '1') || 1)
+  const limit = Math.min(50, Math.max(1, Number(limitParam ?? '9') || 9))
+  const q = typeof qParam === 'string' ? qParam.trim() : ''
   const filter: Record<string, unknown> = {}
   if (q) {
     filter.name = { $regex: escapeRegExp(q), $options: 'i' }
+  }
+  if (category) {
+    filter.category = category
   }
   if (active !== undefined) {
     filter.active = active
@@ -117,6 +148,16 @@ export async function POST(request: Request) {
   const parsed = parseProduct(body)
   if ('error' in parsed) {
     return NextResponse.json({ error: parsed.error }, { status: 400 })
+  }
+
+  const categoryName = (parsed.value as { category?: string }).category
+  if (typeof categoryName === 'string') {
+    const category = await Category.findOne({
+      name: { $regex: `^${escapeRegExp(categoryName)}$`, $options: 'i' },
+    }).lean()
+    if (!category) {
+      return NextResponse.json({ error: 'Category not found' }, { status: 400 })
+    }
   }
 
   const product = await Product.create(parsed.value)
